@@ -1,15 +1,17 @@
 #!/bin/bash
-# Script author      	: Oscar Foley
-# Script Description 	: This script makes a syntax check of all ecl code
-# Version				: 1.0
+# Script author       : Oscar Foley
+# Script Description  : This script makes a syntax check of all ecl code
+# Version             : 1.0
 # Notes
 
 # Check dependencies
 which eclcc >/dev/null 2>&1 || { echo >&2 "Script requires eclcc from HPCC client tools but it's not installed (https://hpccsystems.com/download/developer-tools/client-tools).  Aborting."; exit 1; }
 
 # Parameters
-ExcludedDirectories=$1
-IgnoreWarnings=$2
+RelativePathToCODEDirectory=$1 #"../../HPCC"
+RelativePathToIMPORTSDirectory=$2 # "../../HPCC"
+ExcludedDirectories=$3
+IgnoreWarnings=$4
 
 function_ArrayContainsElement() 
 {
@@ -54,19 +56,16 @@ function_syntaxCheckFileName()
 
 function_SyntaxCheckAllFilesInDirectory()
 {
-
- 
-	pDirectory=$1
+  pDirectory=$1
   pBASEImportsDirectory=$2
   pIgnoreWarnings=$3
+  
   tmpTotalErrors=0
-
   result=0
   echo "Checking directory: $pDirectory"
-  
   find "$pDirectory" -name '*.ecl' -print0 | while read -d $'\0' file
   do 
-    function_syntaxCheckFileName "$file" "$pBASEImportsDirectory"  $pIgnoreWarnings
+    function_syntaxCheckFileName "$file" "$pBASEImportsDirectory" $pIgnoreWarnings
     result=$?
     tmpTotalErrors=$((tmpTotalErrors + result)) 
   done  
@@ -75,11 +74,11 @@ function_SyntaxCheckAllFilesInDirectory()
 
 # MAIN
 sourceDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-CODEDirectory=$( readlink -f "$sourceDir/../../HPCC" )
-BASEImportsDirectory=$CODEDirectory
-tmpFileName="/tmp/tmpSyntaxCheckResult"
+CODEDirectoryFullPath=$( readlink -f "$sourceDir/$RelativePathToCODEDirectory" )
+BASEImportsDirectory=$( readlink -f "$sourceDir/$RelativePathToIMPORTSDirectory" )
+tmpFileName="./tmpSyntaxCheckResult.tmp"
 echo "Script source directory=$sourceDir"
-echo "Syntax check *.ecl files in directory= $CODEDirectory"
+echo "Syntax check *.ecl files in directory= $CODEDirectoryFullPath"
 echo "Base directory for imports= $BASEImportsDirectory"
 echo "HPCC client tools version= $( eclcc --version )"
 
@@ -93,7 +92,7 @@ rm $tmpFileName -f 2>/dev/null
 
 IFS=', ' read -r -a arrayExcludedDirectories <<< "$ExcludedDirectories"
 totalErrors=0
-find "$CODEDirectory" -mindepth 1 -maxdepth 1 -type d -print0  | while read -d '' -r elementString; 
+find "$CODEDirectoryFullPath" -mindepth 1 -maxdepth 1 -type d -print0  | while read -d '' -r elementString; 
 do 
   if function_ArrayContainsElement $(basename "$elementString") "${arrayExcludedDirectories[@]}";  # Exclude directories that are in exclusion list
   then
@@ -104,8 +103,7 @@ do
     totalErrors=$((totalErrors + resultErrors))
   fi
 done
-# totaLErrors value is lost due to a bug in bash. Using shopt as explained here http://mywiki.wooledge.org/BashFAQ/024
-# causes a Segmentation Fault
+# totaLErrors value is lost due to a bug in bash. Shopt solution as explained here http://mywiki.wooledge.org/BashFAQ/024 causes a Segmentation Fault :-(
 # As a (horrible) workaround I write number of errors to a tmp file ($tmpFileName) and add the end I add them.
 sum=0; while read num ; do sum=$(($sum + $num)); done < $tmpFileName ;
 totalErrorsFromFile=$sum
