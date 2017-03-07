@@ -9,9 +9,11 @@
   Script makes a Syntax Check on all *.ecl files in a given directory and subdirectories.
  
  Useful in these situations:
-  - Windows PowerShell Script: Moving or refactoring files in your project. You can use it in conjuction with ECLIDE.
+  - Windows PowerShell Script: Moving or refactoring files in your project. You can use it in conjunction with ECLIDE.
   - Linux BASH Script: Integrate it as one step of your CI build.
 
+  Check HPCC forum for more info and screenshots: https://hpccsystems.com/bb/viewtopic.php?f=9&t=3913 
+  
 ### Windows
 
  This is a powershell script with a .config file:
