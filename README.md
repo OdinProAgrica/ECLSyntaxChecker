@@ -4,19 +4,17 @@
 
 ### Description
 
- This script can be useful if you are developing a project in HPCC: https://hpccsystems.com
- 
- It allows you to perform a Syntax Check in all files as ECLIDE can only make syntax check of a single file.
- 
- Script makes a Syntax Check on all *.ecl files in a given directory and subdirectories.
+ This script can be useful if you are developing a project in HPCC: https://hpccsystems.com. 
+  It allows you to perform a Syntax Check in all files as ECLIDE can only make syntax check of a single file.
+  Script makes a Syntax Check on all *.ecl files in a given directory and subdirectories.
  
  Useful in these situations:
-  - Moving or refactoring files in your project.
-  - As part of your CI build.
+  - Windows PowerShell Script: Moving or refactoring files in your project. You can use it in conjuction with ECLIDE.
+  - Linux BASH Script: Integrate it as one step of your CI build.
 
 ### Windows
 
- This is a simple powershell script with a .config file:
+ This is a powershell script with a .config file:
   - $relativePathToCODEDirectory    --> Relative path from script to your ECL code.
   - $relativePathToImportsDirectory --> Relative path from script to base path for ECL IMPORTS.
   - $logfile                        --> Name of log file (i.e: "EclSyntaxCheck.log").
@@ -32,4 +30,13 @@
 
 ### Linux
 
- To be uploaded soon...
+ This is a BASH script with four parameters:
+  - RelativePathToCODEDirectory     --> Relative path from script to your ECL code.
+  - RrelativePathToImportsDirectory --> Relative path from script to base path for ECL IMPORTS.
+  - ExcludedDirectories             --> Top level directories under $CODEDirectory to be ignored.
+  - IgnoreWarnings                  --> $true will make syntax check to ignore warnings.
+ 
+ TODO
+ - Resolve "horrible" workaround.
+ - Allow to pass log file name as parameter.
+ - Allow passing ECL Client Tools as parameter rather than relying in eclcc being in path.
