@@ -1,12 +1,20 @@
 # Script author      	: Oscar Foley
 # Script Description 	: This script makes a syntax check of all ecl code
-# Version				: 1.0
+# Version				: 1.1
 # Notes
 
-
-function Write-LogMessage($message, $logfile)
+function Write-LogMessage($message, $logfile, $isError = $false)
 {
-    Write-Host $message
+    if ($isError)
+    {
+        $textColour = 'red'
+    }
+    else
+    {
+        $textColour = 'white'
+    }
+    
+    Write-Host $message -ForegroundColor $textColour
     Add-Content $logfile $message
 }
 
@@ -19,7 +27,6 @@ function DetectPowershellVersion($minVersion=3, $logFile)
     {
         throw "ERROR. Script needs Powershell $minVersion or higher."
     }
-    
 }
 
 function DetectECLCCVersion($logFile)
@@ -38,8 +45,6 @@ function DetectECLCCVersion($logFile)
     {
         $env:Path += ";$eclClientTools"
     }
-
-    
 }
 
 function PrintCompilingErrors($fileName, $stringList, $ignoreWarnings = $false, $logfile)
@@ -52,17 +57,15 @@ function PrintCompilingErrors($fileName, $stringList, $ignoreWarnings = $false, 
             {
                 if (!$element.Contains(': warning C'))
                 {   
-                    Write-LogMessage " $element" $logfile
+                    Write-LogMessage " $element" $logfile $true
                 }
             }
             else
             {
-                Write-LogMessage " $element" $logfile
+                Write-LogMessage " $element" $logfile $true
             }
         }
-        
     }
-
 }
 
 function SyntaxCheckAllFilesInDirectory($BASEDirectory, $BASEImportsDirectory, $ignoreWarnings, $logfile)
