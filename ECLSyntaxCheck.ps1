@@ -1,7 +1,7 @@
 # Script author      	: Oscar Foley
 # Script Description 	: This script makes a syntax check of all ecl code
-# Version				: 1.1
 # Notes
+$Version				= "1.2"
 
 function Write-LogMessage($message, $logfile, $isError = $false)
 {
@@ -89,7 +89,9 @@ cd $scriptsDirectory
 # MAIN
 try
 {
+    $startTime = Get-Date
     cls
+    Write-LogMessage "ECLSyntaxChecker version $Version started ($startTime)" $logfile
     Remove-Item -Force "$scriptsDirectory\$logFile" -ErrorAction SilentlyContinue
     Write-LogMessage "Initializing log file: $scriptsDirectory\$logFile" $logFile
     
@@ -113,6 +115,7 @@ try
     
     Write-LogMessage "Checking directories from $CODEDirectory" $logfile
     $list = Get-ChildItem -Path $CODEDirectory -Directory
+    
     foreach ($dir in $list)
     {
         if ($excludedDirectories.Contains($dir.Name))
@@ -127,7 +130,11 @@ try
     
     }
 
-    Write-LogMessage "Finished ECL SyntaxCheck :-)" $logfile
+    #END
+    $endTime = Get-Date
+    Write-LogMessage "Finished ECL SyntaxCheck ($endTime)" $logfile
+    $elapsedTime = new-timespan $startTime $endTime 
+    Write-LogMessage "Script time = $elapsedTime" $logfile
     $exitCode = 0
 }
 Catch 
